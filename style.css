@@ -1,0 +1,184 @@
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+
+}
+@media (max-width: 480px) {
+  .container {
+    margin: 20px;
+    padding: 15px;
+  }
+
+  .input-group {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+  }
+}
+
+.btn-primary {
+  background-color: #2563eb;
+}
+
+.btn-danger {
+  background-color: #dc2626;
+}
+
+.btn-secondary {
+  background-color: #6b7280;
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c;
+}
+
+
+body {
+  background-color: #f4f6f8;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+}
+
+.container{
+  background-color: #ffffff;
+  margin-top: 40px;
+  padding: 20px;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #1f2937;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+.empty {
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+  margin-top: 15px;
+}
+
+
+input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 6px;
+  background-color: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+button {
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+button:active {
+  transform: scale(0.97);
+}
+
+button:hover {
+  background-color: #1e40af;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  background-color: #f9fafb;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+li:hover {
+  transform: translateX(3px);
+  background-color: #e5e7eb;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-between;
+  background-color: #f9fafb;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 15px;
+  font-size: 13px;
+}
+
+.stats span {
+  font-weight: bold;
+}
+
+
+.actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.actions button {
+  background-color: #dc2626;
+}
+
+.actions button:hover {
+  background-color: #b91c1c;
+}
+
+
+ul {
+  padding: 0;
+}
+
+li {
+  list-style: none;
+  padding: 8px;
+  margin: 4px 0;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+/* Classe usada no exercício de hover */
+.mouse1 {
+  background-color: #f0f0f0;
+}
+
+/* Classe usada no exercício de riscar item */
+.completed {
+  text-decoration: line-through;
+  color: gray;
+}

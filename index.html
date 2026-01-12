@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista de Itens</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+
+  <h1>Minha Lista</h1>
+    <div class="input-group">
+      <input type="text" id="itemInput" placeholder="Digite um item">
+      <button id="addBtn">Adicionar</button>
+    </div>
+
+    <div class="actions">
+      <!-- Use estes botões para o Exercício D -->
+      <button id="removeFirstBtn" class="btn-primary">Remover Primeiro</button>
+      <button id="removeLastBtn">Remover Último</button>
+      <button id="vconsistencia">Verificar Consistência</button>
+      <button id="dompraarray">converter DOM pra Array</button>
+      <button id="removecompleted" class="btn-danger">remover completed</button>
+    </div>
+    <div class="stats">
+      <p id="total"></p>
+      <p id="done"></p>
+      <p id="pending"></p>
+    </div>
+
+
+  <ul id="list"></ul>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
