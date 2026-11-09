@@ -56,3 +56,17 @@ e aplicações full stack no futuro.
 ## Preview
 
 ![Tela do aplicativo](assets/imagem1.png)
+
+## Testes de regressão
+
+Requer Node.js 20 ou superior, sem dependências adicionais:
+
+```sh
+node --test tests/*.test.cjs
+node --check script.js
+```
+
+Os testes executam o script real em um DOM simulado, cobrindo lista vazia,
+ordem das tarefas, remoções e adição após o estado vazio. Não substituem
+testes visuais em um navegador. O aviso de lista vazia não é uma tarefa
+e não deve aparecer na conversão DOM → array nem causar falso alerta de inconsistência.
