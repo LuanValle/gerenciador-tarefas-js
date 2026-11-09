@@ -158,7 +158,7 @@ vconsistencia.addEventListener("click", function(){
   console.log("Arrays: `task`: ", tasks);
 
   //mostrar tarefas renderizadas no DOM.
-  const renderdItems = Array.from(list.children).map(item => item.textContent.trim());
+  const renderdItems = Array.from(list.querySelectorAll("li")).map(item => item.textContent.trim());
   console.log("Itens renderizados no DOM: ", renderdItems);
 
   //veridicar se o array e o DOM sao iguais.
@@ -172,7 +172,7 @@ vconsistencia.addEventListener("click", function(){
 
 //converter dom pra array
 domarray.addEventListener("click", function(){
-  const listChildren = Array.from(list.children);
+  const listChildren = Array.from(list.querySelectorAll("li"));
   console.log(listChildren)
 
   const textos = listChildren.map(item => item.textContent.trim());
