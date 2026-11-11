@@ -10,19 +10,48 @@ const primeiro = document.getElementById("removeFirstBtn");
 const vconsistencia = document.getElementById("vconsistencia");
 const domarray = document.getElementById("dompraarray");
 const removeCompleted = document.getElementById("removecompleted");
+const storageStatus = document.getElementById("storageStatus");
 
 // 🔹 ESTADO (array)
 let tasks = [];
 
 
+// Após uma falha, mantenha esta sessão em memória sem sobrescrever dados salvos.
+let storageAvailable = true;
+
+function enterMemoryMode(message) {
+  storageAvailable = false;
+  storageStatus.textContent = message;
+  storageStatus.hidden = false;
+}
+
 function saveTasks(){
-  localStorage.setItem("tasks", JSON.stringify(tasks));
+  if (!storageAvailable) return;
+  try {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  } catch {
+    enterMemoryMode("Não foi possível salvar suas tarefas. As alterações ficam apenas nesta sessão e serão perdidas ao recarregar a página.");
+  }
 }
-//funçao que pega o que fica salvo
-const savedTasks = localStorage.getItem("tasks");
-if(savedTasks){
-  tasks = JSON.parse(savedTasks);
+
+function loadTasks() {
+  try {
+    const savedTasks = localStorage.getItem("tasks");
+    if (savedTasks === null) return;
+
+    const parsedTasks = JSON.parse(savedTasks);
+    if (!Array.isArray(parsedTasks) || !parsedTasks.every(task =>
+      task !== null && typeof task === "object" &&
+      typeof task.text === "string" && typeof task.completed === "boolean"
+    )) {
+      throw new Error("Formato de tarefas inválido");
+    }
+    tasks = parsedTasks;
+  } catch {
+    enterMemoryMode("Não foi possível carregar suas tarefas salvas. Você pode continuar nesta sessão; o conteúdo salvo não será alterado e as novas tarefas serão perdidas ao recarregar a página.");
+  }
 }
+loadTasks();
 renderTasks();
 
 // 🔹 FUNÇÃO QUE DESENHA A TELA
@@ -82,7 +111,7 @@ function renderTasks() {
 
 
 
-  localStorage.setItem("tasks",JSON.stringify(tasks));
+  saveTasks();
 }
 
 // 🔹 4) FUNÇÃO DE ADICIONAR
