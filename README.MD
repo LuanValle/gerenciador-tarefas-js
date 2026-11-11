@@ -56,3 +56,25 @@ e aplicações full stack no futuro.
 ## Preview
 
 ![Tela do aplicativo](assets/imagem1.png)
+
+## Falhas de armazenamento
+
+Se o navegador impedir o acesso ao `localStorage` ou os dados salvos não tiverem
+formato válido, o aplicativo mostra um aviso e continua funcionando em memória.
+O conteúdo salvo não é apagado nem sobrescrito após essa falha. As alterações
+feitas nessa sessão não persistem ao recarregar a página. Recuperar dados
+corrompidos ou mesclar alterações entre abas não faz parte deste tratamento.
+
+## Testes de regressão
+
+Com Node.js 18 ou superior, execute:
+
+```sh
+node --test tests/*.test.cjs
+node --check script.js
+```
+
+Os testes executam o script real com DOM simulado e armazenamento em memória,
+sem acessar dados pessoais. Eles cobrem carregamento válido, JSON/formato
+inválido, leitura bloqueada, falha de gravação e operações após a falha.
+Não substituem testes em navegador nem comprovam o gesto nativo de duplo clique.
