@@ -147,7 +147,8 @@ function addItem() {
 
 //adciona os itens apertando Enter
 input.addEventListener("keydown", function(event){
-  if(event.key === "Enter"){
+  // Confirmar texto no IME não deve enviar uma tarefa ainda em composição.
+  if(event.key === "Enter" && !event.isComposing && event.keyCode !== 229){
     addItem();
   }
 });
