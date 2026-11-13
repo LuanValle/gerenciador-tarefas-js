@@ -140,7 +140,6 @@ function addItem() {
 
   renderTasks();
 
-  console.log(tasks);
   input.value = "";
   input.focus();
 }
