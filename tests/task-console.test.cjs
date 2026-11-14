@@ -74,3 +74,29 @@ test('explicit educational diagnostics remain available', () => {
   app.elements.dompraarray.click();
   assert.deepEqual(Array.from(app.logs.at(-1)[1]), ['estudar']);
 });
+
+test('completion toggle persists and keeps counters synchronized without logging', () => {
+  const app = startApp([{text:'estudar', completed:false}]);
+  app.elements.list.children[0].click();
+  assert.deepEqual(app.stored(), [{text:'estudar', completed:true}]);
+  assert.equal(app.elements.done.textContent, 'Concluidas: 1');
+  assert.equal(app.elements.pending.textContent, 'Pendentes: 0');
+  app.elements.list.children[0].click();
+  assert.deepEqual(app.stored(), [{text:'estudar', completed:false}]);
+  assert.equal(app.elements.done.textContent, 'Concluidas: 0');
+  assert.equal(app.elements.pending.textContent, 'Pendentes: 1');
+  assert.deepEqual(app.logs, []);
+});
+for (const button of ['removeFirstBtn', 'removeLastBtn', 'removecompleted']) {
+  test(button + ' persists removal and repeated empty operations without logging', () => {
+    const app = startApp([{text:'estudar', completed:true}]);
+    app.elements[button].click();
+    app.elements[button].click();
+    assert.deepEqual(app.stored(), []);
+    assert.equal(app.elements.total.textContent, 'Total de tarefas: 0');
+    assert.equal(app.elements.done.textContent, 'Concluidas: 0');
+    assert.equal(app.elements.pending.textContent, 'Pendentes: 0');
+    assert.equal(app.elements.list.children[0].textContent, 'Nenhuma tarefa adicionada ainda.');
+    assert.deepEqual(app.logs, []);
+  });
+}
