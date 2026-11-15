@@ -13,7 +13,7 @@ function startApp(initialTasks = [], answer = null) {
       this.handlers = {};
       this.textContent = '';
       this.value = '';
-      this.classList = { add() {} };
+      this.classList = { add() {}, toggle() {} };
     }
     set textContent(value) { this.text = value; this.children = []; }
     get textContent() { return this.text + this.children.map(child => child.textContent).join(''); }
@@ -89,3 +89,20 @@ test('adding a valid task normalizes its title', () => {
  app.elements.addBtn.click();
  assert.deepEqual(app.stored(), [...initial, {text:'ler livro', completed:false}]);
 });
+
+for (const answer of [null, 'ab', 'Ler Livro']) {
+ test(`click sequence keeps the same target and completion before edit: ${answer}`, () => {
+   const app = startApp(initial, answer);
+   const target = app.elements.list.children[0];
+   target.click();
+   assert.equal(app.elements.list.children[0], target);
+   assert.equal(app.stored()[0].completed, false);
+   assert.equal(app.elements.pending.textContent, 'Pendentes: 2');
+   target.click();
+   assert.equal(app.elements.list.children[0], target);
+   target.handlers.dblclick({stopImmediatePropagation() {}});
+   assert.equal(app.stored()[0].completed, true);
+   assert.equal(app.stored()[0].text, answer === 'Ler Livro' ? 'ler livro' : 'estudar');
+   assert.equal(app.elements.done.textContent, 'Concluidas: 1');
+ });
+}
