@@ -51,7 +51,10 @@ function renderTasks() {
     //clique simples: alterna concluido / nao concluido:
     li.addEventListener("click", function(){
       tasks[i].completed = !tasks[i].completed;
-      renderTasks();
+      // Preserve o alvo entre os dois cliques que formam dblclick.
+      li.classList.toggle("completed", tasks[i].completed);
+      updateCounters();
+      saveTasks();
     });
 
     //clique duplo para editar
@@ -74,18 +77,14 @@ function renderTasks() {
     list.appendChild(li);
   }
 
-  //total
+  updateCounters();
+  saveTasks();
+}
+
+function updateCounters() {
   total.textContent = "Total de tarefas: " + tasks.length;
-
-  //filtra as nao concluidas econta
   pending.textContent = "Pendentes: " + tasks.filter(task => !task.completed).length;
-
-  //filtra as concluidas e exibe na tela.
   done.textContent = "Concluidas: " + tasks.filter(task => task.completed).length;
-
-
-
-  localStorage.setItem("tasks",JSON.stringify(tasks));
 }
 
 // Mesmas regras para criar e editar; a tarefa atual não é uma duplicata.
