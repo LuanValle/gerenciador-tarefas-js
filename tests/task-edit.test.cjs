@@ -106,3 +106,25 @@ for (const answer of [null, 'ab', 'Ler Livro']) {
    assert.equal(app.elements.done.textContent, 'Concluidas: 1');
  });
 }
+
+for (const title of ['abc', 'abcdefghijklmnopqrst']) {
+  test(`editing second item accepts exact length boundary: ${title.length}`, () => {
+    const app = startApp(initial, title);
+    edit(app, 1);
+    assert.deepEqual(app.stored(), [initial[0], { text: title, completed: false }]);
+    assert.equal(app.alerts.length, 0);
+    assert.equal(app.elements.list.children[1].children[0].textContent, title);
+  });
+}
+test('editing second item does not mistake itself for a duplicate', () => {
+  const app = startApp(initial, '  TREINAR  ');
+  edit(app, 1);
+  assert.deepEqual(app.stored(), initial);
+  assert.equal(app.alerts.length, 0);
+});
+test('editing second item still rejects the first item title', () => {
+  const app = startApp(initial, '  ESTUDAR  ');
+  edit(app, 1);
+  assert.deepEqual(app.stored(), initial);
+  assert.equal(app.alerts.length, 1);
+});
