@@ -13,7 +13,17 @@ function startApp(initialTasks = [], answer = null) {
       this.handlers = {};
       this.textContent = '';
       this.value = '';
-      this.classList = { add() {}, toggle() {} };
+      const classes = new Set();
+      this.classList = {
+        add: name => classes.add(name),
+        contains: name => classes.has(name),
+        toggle(name, force) {
+          const enabled = force === undefined ? !classes.has(name) : Boolean(force);
+          if (enabled) classes.add(name);
+          else classes.delete(name);
+          return enabled;
+        },
+      };
     }
     set textContent(value) { this.text = value; this.children = []; }
     get textContent() { return this.text + this.children.map(child => child.textContent).join(''); }
@@ -127,4 +137,30 @@ test('editing second item still rejects the first item title', () => {
   edit(app, 1);
   assert.deepEqual(app.stored(), initial);
   assert.equal(app.alerts.length, 1);
+});
+
+
+// Check the class used by CSS as well as state; a no-op classList hid this regression.
+for (const completed of [false, true]) {
+  test(`completion class follows repeated clicks from completed=${completed}`, () => {
+    const app = startApp([{ text: 'estudar', completed }]);
+    const target = app.elements.list.children[0];
+    assert.equal(target.classList.contains('completed'), completed);
+    for (let count = 1; count <= 3; count++) {
+      target.click();
+      const expected = count % 2 ? !completed : completed;
+      assert.equal(app.elements.list.children[0], target);
+      assert.equal(target.classList.contains('completed'), expected);
+      assert.equal(app.stored()[0].completed, expected);
+      assert.equal(app.elements.done.textContent, `Concluidas: ${Number(expected)}`);
+      assert.equal(app.elements.pending.textContent, `Pendentes: ${Number(!expected)}`);
+    }
+  });
+}
+test('editing reconstructs completion classes without marking the pending item', () => {
+  const app = startApp(initial, 'ler livro');
+  edit(app, 0);
+  assert.equal(app.elements.list.children[0].classList.contains('completed'), true);
+  assert.equal(app.elements.list.children[1].classList.contains('completed'), false);
+  assert.deepEqual(app.stored(), [{ text: 'ler livro', completed: true }, initial[1]]);
 });
