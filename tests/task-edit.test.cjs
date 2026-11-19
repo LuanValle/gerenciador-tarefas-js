@@ -164,3 +164,47 @@ test('editing reconstructs completion classes without marking the pending item',
   assert.equal(app.elements.list.children[1].classList.contains('completed'), false);
   assert.deepEqual(app.stored(), [{ text: 'ler livro', completed: true }, initial[1]]);
 });
+
+
+const atCapacity = [
+  ...initial,
+  { text: 'cozinhar', completed: false },
+  { text: 'correr', completed: false },
+  { text: 'dormir', completed: false },
+];
+test('a new valid title can replace the fifth item at capacity', () => {
+  const app = startApp(atCapacity, ' Ler Livro ');
+  edit(app, 4);
+  assert.deepEqual(app.stored(), [
+    ...atCapacity.slice(0, 4), { text: 'ler livro', completed: false },
+  ]);
+  assert.equal(app.alerts.length, 0);
+  assert.equal(app.elements.total.textContent, 'Total de tarefas: 5');
+  assert.equal(app.elements.list.children[4].children[0].textContent, 'ler livro');
+});
+for (const method of ['button', 'Enter']) {
+  test(`capacity rejects a sixth item via ${method} but removal frees a slot`, () => {
+    const app = startApp(atCapacity);
+    app.elements.itemInput.value = 'ler livro';
+    const add = () => method === 'button'
+      ? app.elements.addBtn.click()
+      : app.elements.itemInput.handlers.keydown({ key: 'Enter' });
+    add();
+    assert.deepEqual(app.stored(), atCapacity);
+    assert.equal(app.alerts.length, 1);
+    assert.equal(app.alerts[0], 'limite de entradas excedida!');
+    assert.equal(app.elements.itemInput.value, 'ler livro');
+    assert.equal(app.elements.total.textContent, 'Total de tarefas: 5');
+
+    app.elements.removeLastBtn.click();
+    add();
+    assert.deepEqual(app.stored(), [
+      ...atCapacity.slice(0, 4), { text: 'ler livro', completed: false },
+    ]);
+    assert.equal(app.alerts.length, 1);
+    assert.equal(app.elements.itemInput.value, '');
+    assert.equal(app.elements.total.textContent, 'Total de tarefas: 5');
+    assert.equal(app.elements.pending.textContent, 'Pendentes: 4');
+    assert.equal(app.elements.done.textContent, 'Concluidas: 1');
+  });
+}
