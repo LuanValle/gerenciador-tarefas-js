@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const path = require('node:path');
 
 // Minimal DOM double: run the actual script and its registered handlers.
-function startApp(initialTasks = [], answer = null) {
+function startApp(initialTasks = [], answer = null, storage = { tasks: JSON.stringify(initialTasks) }) {
   class Element {
     constructor(tagName = 'div') {
       this.tagName = tagName;
@@ -42,14 +42,16 @@ function startApp(initialTasks = [], answer = null) {
   const elements = Object.fromEntries(ids.map(id => [id, new Element()]));
   const alerts = [];
   const logs = [];
-  let stored = JSON.stringify(initialTasks);
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../script.js'), 'utf8'), {
     document: { getElementById: id => elements[id], createElement: tag => new Element(tag) },
-    localStorage: { getItem: () => stored, setItem: (_, value) => { stored = value; } },
+    localStorage: {
+      getItem: key => storage[key] ?? null,
+      setItem: (key, value) => { storage[key] = value; },
+    },
     alert: message => alerts.push(message), console: { log: (...args) => logs.push(args) },
     prompt: () => answer,
   });
-  return { elements, alerts, logs, stored: () => JSON.parse(stored) };
+  return { elements, alerts, logs, stored: () => JSON.parse(storage.tasks) };
 }
 
 
@@ -208,3 +210,24 @@ for (const method of ['button', 'Enter']) {
     assert.equal(app.elements.done.textContent, 'Concluidas: 1');
   });
 }
+
+test('a fresh app restores the edited title, order and completion from saved JSON', () => {
+  const storage = {};
+  const app = startApp([], '  Ler Livro  ', storage);
+  for (const title of ['estudar', 'treinar']) {
+    app.elements.itemInput.value = title;
+    app.elements.addBtn.click();
+  }
+  edit(app);
+  app.elements.list.children[1].click();
+
+  // New DOM and JS context, retaining only the same simulated storage.
+  const reloaded = startApp([], null, storage);
+  const rows = reloaded.elements.list.children;
+  assert.notEqual(reloaded.elements.list, app.elements.list);
+  assert.deepEqual(rows.map(row => row.textContent), ['ler livro', 'treinar']);
+  assert.deepEqual(rows.map(row => row.classList.contains('completed')), [false, true]);
+  assert.equal(reloaded.elements.total.textContent, 'Total de tarefas: 2');
+  assert.equal(reloaded.elements.pending.textContent, 'Pendentes: 1');
+  assert.equal(reloaded.elements.done.textContent, 'Concluidas: 1');
+});
