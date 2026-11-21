@@ -231,3 +231,28 @@ test('a fresh app restores the edited title, order and completion from saved JSO
   assert.equal(reloaded.elements.pending.textContent, 'Pendentes: 1');
   assert.equal(reloaded.elements.done.textContent, 'Concluidas: 1');
 });
+
+for (const [scenario, answer] of [['canceled', null], ['duplicate', '  TREINAR  ']]) {
+  test(`a ${scenario} edit does not rewrite storage or rebuild the task list`, () => {
+    const writes = [];
+    const storage = new Proxy({ tasks: JSON.stringify(initial) }, {
+      set(target, key, value) {
+        writes.push(key);
+        return Reflect.set(target, key, value);
+      },
+    });
+    const app = startApp(initial, answer, storage);
+    const writesBeforeEdit = writes.length;
+    const savedBeforeEdit = storage.tasks;
+    const rowsBeforeEdit = [...app.elements.list.children];
+
+    edit(app);
+
+    assert.equal(writes.length, writesBeforeEdit);
+    assert.equal(storage.tasks, savedBeforeEdit);
+    assert.equal(app.elements.list.children.length, rowsBeforeEdit.length);
+    for (const [index, row] of rowsBeforeEdit.entries()) {
+      assert.equal(app.elements.list.children[index], row);
+    }
+  });
+}
