@@ -51,7 +51,10 @@ function renderTasks() {
     //clique simples: alterna concluido / nao concluido:
     li.addEventListener("click", function(){
       tasks[i].completed = !tasks[i].completed;
-      renderTasks();
+      // Preserve o alvo entre os dois cliques que formam dblclick.
+      li.classList.toggle("completed", tasks[i].completed);
+      updateCounters();
+      saveTasks();
     });
 
     //clique duplo para editar
@@ -61,7 +64,10 @@ function renderTasks() {
       if(textoNovo === null)return;
       if(textoNovo.trim() === "")return;
 
-      tasks[i].text = textoNovo.toLowerCase();
+      const text = textoNovo.trim();
+      if (!isValidTaskText(text, i)) return;
+
+      tasks[i].text = text.toLowerCase();
       saveTasks();
       renderTasks();
     })
@@ -71,18 +77,49 @@ function renderTasks() {
     list.appendChild(li);
   }
 
-  //total
+  updateCounters();
+  saveTasks();
+}
+
+function updateCounters() {
   total.textContent = "Total de tarefas: " + tasks.length;
-
-  //filtra as nao concluidas econta
   pending.textContent = "Pendentes: " + tasks.filter(task => !task.completed).length;
-
-  //filtra as concluidas e exibe na tela.
   done.textContent = "Concluidas: " + tasks.filter(task => task.completed).length;
+}
 
+// Mesmas regras para criar e editar; a tarefa atual não é uma duplicata.
+function isValidTaskText(text, editingIndex = -1) {
+  //nao deixa entrar com menos de 3 caracteres
+  if(text.length < 3){
+    alert("digite um valor maior que 3 caracteres!");
+    return false;
+  }
 
+  //nao adciona se for maior que 20 caracteres
+  if(text.length > 20){
+    alert("limite de caracteres atingido!");
+    return false;
+  }
 
-  localStorage.setItem("tasks",JSON.stringify(tasks));
+    //nao permite apenas numero
+  if(!isNaN(text)){
+    alert("não é permitido apenas numeros!");
+    return false;
+  }
+
+    //nao permite primeiro caracter como numero
+  if(!isNaN(text[0])){
+    alert("nao pode começar com numero!");
+    return false;
+  }
+
+    //B2 verifica duplicado:
+  if (tasks.some((task, index) => index !== editingIndex && task.text === text.toLowerCase())){
+    alert("essa tarefa ja existe!");
+    return false;
+  }
+
+  return true;
 }
 
 // 🔹 4) FUNÇÃO DE ADICIONAR
@@ -94,35 +131,7 @@ function addItem() {
     return;
   }
 
-  //nao deixa entrar com menos de 3 caracteres
-  if(text.length < 3){
-    alert("digite um valor maior que 3 caracteres!");
-    return;
-  }
-
-  //nao adciona se for maior que 20 caracteres
-  if(text.length > 20){
-    alert("limite de caracteres atingido!");
-    return;
-  }
-
-    //nao permite apenas numero
-  if(!isNaN(text)){
-    alert("não é permitido apenas numeros!");
-    return;
-  }
-
-    //nao permite primeiro caracter como numero
-  if(!isNaN(text[0])){
-    alert("nao pode começar com numero!");
-    return;
-  }
-
-    //B2 verifica duplicado:
-  if (tasks.some(task => task.text === text.toLowerCase())){
-    alert("essa tarefa ja existe!");
-    return;
-  }
+  if (!isValidTaskText(text)) return;
 
   //limite de 5 entradas de dados
   if(tasks.length >= 5){
