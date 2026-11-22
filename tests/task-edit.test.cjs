@@ -49,7 +49,7 @@ function startApp(initialTasks = [], answer = null, storage = { tasks: JSON.stri
       setItem: (key, value) => { storage[key] = value; },
     },
     alert: message => alerts.push(message), console: { log: (...args) => logs.push(args) },
-    prompt: () => answer,
+    prompt: () => typeof answer === 'function' ? answer() : answer,
   });
   return { elements, alerts, logs, stored: () => JSON.parse(storage.tasks) };
 }
@@ -254,5 +254,30 @@ for (const [scenario, answer] of [['canceled', null], ['duplicate', '  TREINAR  
     for (const [index, row] of rowsBeforeEdit.entries()) {
       assert.equal(app.elements.list.children[index], row);
     }
+  });
+}
+
+for (const [scenario, firstAnswer, expectedAlerts] of [
+  ['canceled', null, 0],
+  ['duplicate', '  ESTUDAR  ', 1],
+]) {
+  test(`editing can succeed on the next attempt after a ${scenario} edit`, () => {
+    const answers = [firstAnswer, '  Ler Livro  '];
+    const app = startApp(initial, () => {
+      assert.ok(answers.length, 'unexpected edit prompt');
+      return answers.shift();
+    });
+
+    edit(app, 1);
+    assert.deepEqual(app.stored(), initial);
+    assert.equal(app.alerts.length, expectedAlerts);
+
+    edit(app, 1);
+    assert.equal(answers.length, 0);
+    assert.equal(app.alerts.length, expectedAlerts);
+    assert.deepEqual(app.stored(), [initial[0], { text: 'ler livro', completed: false }]);
+    assert.deepEqual(app.elements.list.children.map(row => row.textContent), ['estudar', 'ler livro']);
+    assert.equal(app.elements.pending.textContent, 'Pendentes: 1');
+    assert.equal(app.elements.done.textContent, 'Concluidas: 1');
   });
 }
