@@ -281,3 +281,31 @@ for (const [scenario, firstAnswer, expectedAlerts] of [
     assert.equal(app.elements.done.textContent, 'Concluidas: 1');
   });
 }
+
+test('creating a task can reuse the previous title after renaming', () => {
+  const app = startApp(initial, '  Ler Livro  ');
+  edit(app, 0);
+
+  app.elements.itemInput.value = '  ESTUDAR  ';
+  app.elements.addBtn.click();
+
+  assert.deepEqual(app.stored(), [
+    { text: 'ler livro', completed: true }, initial[1], { text: 'estudar', completed: false },
+  ]);
+  assert.deepEqual(app.elements.list.children.map(row => row.textContent), ['ler livro', 'treinar', 'estudar']);
+  assert.equal(app.alerts.length, 0);
+  assert.equal(app.elements.done.textContent, 'Concluidas: 1');
+});
+
+test('creating a task rejects the current title after renaming', () => {
+  const app = startApp(initial, '  Ler Livro  ');
+  edit(app, 0);
+
+  app.elements.itemInput.value = '  LER LIVRO  ';
+  app.elements.addBtn.click();
+
+  assert.deepEqual(app.stored(), [{ text: 'ler livro', completed: true }, initial[1]]);
+  assert.deepEqual(app.elements.list.children.map(row => row.textContent), ['ler livro', 'treinar']);
+  assert.deepEqual(app.alerts, ['essa tarefa ja existe!']);
+  assert.equal(app.elements.total.textContent, 'Total de tarefas: 2');
+});
