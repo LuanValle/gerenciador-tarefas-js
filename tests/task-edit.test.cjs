@@ -309,3 +309,26 @@ test('creating a task rejects the current title after renaming', () => {
   assert.deepEqual(app.alerts, ['essa tarefa ja existe!']);
   assert.equal(app.elements.total.textContent, 'Total de tarefas: 2');
 });
+
+test('editing the new first row after removal targets the visible task', () => {
+  const remaining = [
+    { text: 'treinar', completed: true },
+    { text: 'desenhar', completed: false },
+  ];
+  const app = startApp([{ text: 'estudar', completed: false }, ...remaining], '  Ler Livro  ');
+
+  app.elements.removeFirstBtn.click();
+  assert.deepEqual(app.stored(), remaining);
+  assert.deepEqual(app.elements.list.children.map(row => row.textContent), ['treinar', 'desenhar']);
+
+  edit(app, 0);
+
+  assert.deepEqual(app.stored(), [{ text: 'ler livro', completed: true }, remaining[1]]);
+  const rows = app.elements.list.children;
+  assert.deepEqual(rows.map(row => row.textContent), ['ler livro', 'desenhar']);
+  assert.deepEqual(rows.map(row => row.classList.contains('completed')), [true, false]);
+  assert.equal(app.elements.total.textContent, 'Total de tarefas: 2');
+  assert.equal(app.elements.done.textContent, 'Concluidas: 1');
+  assert.equal(app.elements.pending.textContent, 'Pendentes: 1');
+  assert.equal(app.alerts.length, 0);
+});
