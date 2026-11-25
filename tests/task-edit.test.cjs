@@ -332,3 +332,20 @@ test('editing the new first row after removal targets the visible task', () => {
   assert.equal(app.elements.pending.textContent, 'Pendentes: 1');
   assert.equal(app.alerts.length, 0);
 });
+
+test('the edited row still responds to a completion click', () => {
+  const app = startApp(initial, '  Ler Livro  ');
+  edit(app, 1);
+
+  const row = app.elements.list.children[1];
+  assert.equal(row.textContent, 'ler livro');
+  assert.equal(row.classList.contains('completed'), false);
+
+  row.click();
+
+  assert.deepEqual(app.stored(), [initial[0], { text: 'ler livro', completed: true }]);
+  assert.equal(app.elements.list.children[1], row);
+  assert.equal(row.classList.contains('completed'), true);
+  assert.equal(app.elements.done.textContent, 'Concluidas: 2');
+  assert.equal(app.elements.pending.textContent, 'Pendentes: 0');
+});
