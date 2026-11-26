@@ -349,3 +349,21 @@ test('the edited row still responds to a completion click', () => {
   assert.equal(app.elements.done.textContent, 'Concluidas: 2');
   assert.equal(app.elements.pending.textContent, 'Pendentes: 0');
 });
+
+test('bulk removal removes a renamed completed task and preserves pending tasks', () => {
+  const anotherDone = { text: 'desenhar', completed: true };
+  const app = startApp([...initial, anotherDone], '  Ler Livro  ');
+  edit(app, 0);
+
+  assert.deepEqual(app.stored(), [{ text: 'ler livro', completed: true }, initial[1], anotherDone]);
+
+  app.elements.removecompleted.click();
+
+  assert.deepEqual(app.stored(), [initial[1]]);
+  const rows = app.elements.list.children;
+  assert.deepEqual(rows.map(row => row.textContent), ['treinar']);
+  assert.equal(rows[0].classList.contains('completed'), false);
+  assert.equal(app.elements.total.textContent, 'Total de tarefas: 1');
+  assert.equal(app.elements.done.textContent, 'Concluidas: 0');
+  assert.equal(app.elements.pending.textContent, 'Pendentes: 1');
+});
