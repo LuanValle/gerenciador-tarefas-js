@@ -49,8 +49,7 @@ sem o uso de frameworks, simulando o funcionamento de aplicações modernas.
 
 ## Como verificar esta versão
 
-Esta branch contém `tests/task-edit.test.cjs`. Use um checkout desta branch;
-a `main` ainda não contém esta suíte enquanto o PR não for integrado.
+No checkout desta versão, a suíte está em `tests/task-edit.test.cjs`.
 
 ### Testes automatizados
 
