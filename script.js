@@ -67,7 +67,10 @@ function renderTasks() {
       const text = textoNovo.trim();
       if (!isValidTaskText(text, i)) return;
 
-      tasks[i].text = text.toLowerCase();
+      const normalizedText = text.toLowerCase();
+      if (tasks[i].text === normalizedText) return;
+
+      tasks[i].text = normalizedText;
       saveTasks();
       renderTasks();
     })

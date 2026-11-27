@@ -367,3 +367,35 @@ test('bulk removal removes a renamed completed task and preserves pending tasks'
   assert.equal(app.elements.done.textContent, 'Concluidas: 0');
   assert.equal(app.elements.pending.textContent, 'Pendentes: 1');
 });
+
+test('an unchanged normalized title does not save or rebuild the rows', () => {
+  const writes = [];
+  const storage = new Proxy({ tasks: JSON.stringify(initial) }, {
+    set(target, key, value) {
+      writes.push(key);
+      return Reflect.set(target, key, value);
+    },
+  });
+  const app = startApp(initial, '  ESTUDAR  ', storage);
+  const writesBeforeEdit = writes.length;
+  const rowsBeforeEdit = [...app.elements.list.children];
+
+  edit(app);
+
+  assert.equal(writes.length, writesBeforeEdit);
+  assert.deepEqual(app.stored(), initial);
+  assert.equal(app.elements.list.children[0], rowsBeforeEdit[0]);
+  assert.equal(app.elements.list.children[1], rowsBeforeEdit[1]);
+  assert.equal(app.alerts.length, 0);
+});
+
+test('editing still canonicalizes an older title saved with extra spaces', () => {
+  const legacy = [{ text: ' estudar ', completed: true }, initial[1]];
+  const app = startApp(legacy, '  ESTUDAR  ');
+
+  edit(app);
+
+  assert.deepEqual(app.stored(), initial);
+  assert.equal(app.elements.list.children[0].textContent, 'estudar');
+  assert.equal(app.elements.list.children[0].classList.contains('completed'), true);
+});
